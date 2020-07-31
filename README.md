@@ -8,7 +8,7 @@ g++ text.cpp -o gtxt -lncurses
 
 Open a file.  
 ```
-gt file.txt
+gtxt file.txt
 ```
 F1 close editor    
 F2 Save file  
