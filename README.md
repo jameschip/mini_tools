@@ -1,4 +1,4 @@
-# grid_text
+# Mini Tools
 A grid based text editor.
 
 ## compile text
