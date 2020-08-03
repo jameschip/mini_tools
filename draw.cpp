@@ -6,17 +6,25 @@ void add_colour( int c ) {
     attron( COLOR_PAIR( c ) );
 }
 
+void move_print( bool line, int row, int col, int last_colour ) {
+	if ( line ) {
+    	add_colour( last_colour );
+        wmove( stdscr, row, col );
+	} else {
+		wmove( stdscr, row, col );
+	}
+}
+
 int main( int argc, char *argv[] ) {
-    
-    int row,col;
-    int c_row, c_col = 0;
-	int ch;
+
+    int row,col,ch,c_row,c_col = 0;
     bool line = false;
-    int last_colour = 8;
+    int last_colour = 1;
     
 	initscr();
 	cbreak();
     noecho();
+    
     if (has_colors() == FALSE) {
         endwin();
         printf("Your terminal does not support color\n");
@@ -25,7 +33,6 @@ int main( int argc, char *argv[] ) {
     
 	keypad(stdscr, TRUE);
     getmaxyx( stdscr,row,col );
-    move( 0, 0 );
 	refresh();
 
     start_color();
@@ -38,55 +45,37 @@ int main( int argc, char *argv[] ) {
     init_pair(7, COLOR_WHITE, COLOR_BLUE); 
     init_pair(8, COLOR_BLACK, COLOR_WHITE);    
     bkgd( COLOR_PAIR(8) );
-
     clear();    
 
-	while((ch = getch()) != KEY_F(1))
+	while( (ch = getch()) != 'q' )
 	{	
 		getyx( stdscr, c_row, c_col );
+
         switch(ch)
 		{	
 
             case KEY_LEFT:
                 if ( c_col > 0) {
-                    if ( line ) {
-                        add_colour( last_colour );
-                        wmove( stdscr, c_row, c_col - 1 );
-                    } else {
-                        wmove( stdscr, c_row, c_col - 1 );
-                    }
+                	move_print( line, c_row, c_col - 1, last_colour );
                 }
 				break;
 
 			case KEY_RIGHT:
-                if ( c_col < col )
-                    if ( line ) {
-                        add_colour( last_colour ); 
-                        wmove( stdscr, c_row, c_col + 1 );
-                    } else {
-                        wmove( stdscr, c_row, c_col + 1 );
-                    }
+                if ( c_col < col ){
+                	move_print( line, c_row, c_col + 1, last_colour );
+                }
 				break;
 
 			case KEY_UP:
-                if ( c_row > 0)
-                    if ( line ) {
-                        add_colour( last_colour );
-                        wmove( stdscr, c_row - 1, c_col );    
-                    } else {
-                        wmove( stdscr, c_row - 1, c_col );
-                    }
+                if ( c_row > 0){
+                	move_print( line, c_row - 1, c_col, last_colour );
+                	}
                 break;
 
 			case KEY_DOWN:
-                if ( c_row < row ) {
-                    if ( line ) {
-                        add_colour( last_colour );
-                        wmove( stdscr, c_row + 1, c_col );     
-                    } else {
-                        wmove( stdscr, c_row + 1, c_col);
-                    }
-                }
+                if ( c_row < row ){
+                	move_print( line, c_row + 1, c_col, last_colour );
+                	}
 				break;
             
             case '1':
@@ -102,16 +91,20 @@ int main( int argc, char *argv[] ) {
                 line = false;
                 break;
 
+			case 'c':
+				bkgd( COLOR_PAIR(8) );
+				clear(); 
             case 'l':
                 line = !line;            
-
+				break;
+				
+				
             default:
                 break;
 		}
-	}
-		
+	}		
+	
 	endwin();
-    
 	return 0;
 }
 
