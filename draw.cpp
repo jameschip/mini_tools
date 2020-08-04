@@ -6,8 +6,9 @@ void add_colour( int c ) {
     attron( COLOR_PAIR( c ) );
 }
 
-void move_print( bool line, int row, int col, int last_colour ) {
-	if ( line ) {
+void move_print( bool line, int row, int col, int last_colour, int * sq ) {
+    *sq = 1;
+    if ( line ) {
     	add_colour( last_colour );
         wmove( stdscr, row, col );
 	} else {
@@ -15,11 +16,12 @@ void move_print( bool line, int row, int col, int last_colour ) {
 	}
 }
 
+
 int main( int argc, char *argv[] ) {
 
-    int row,col,ch,c_row,c_col = 0;
+    int row,col,ch,c_row,c_col,sq_r,sq_c;
     bool line = false;
-    int last_colour = 1;
+    int last_colour,sq_size = 1;
     
 	initscr();
 	cbreak();
@@ -47,35 +49,30 @@ int main( int argc, char *argv[] ) {
     bkgd( COLOR_PAIR(8) );
     clear();    
 
-	while( (ch = getch()) != 'q' )
-	{	
+	while( (ch = getch()) != 'q' ) {
+
 		getyx( stdscr, c_row, c_col );
 
-        switch(ch)
-		{	
+        switch(ch) {	
 
             case KEY_LEFT:
-                if ( c_col > 0) {
-                	move_print( line, c_row, c_col - 1, last_colour );
-                }
+                if ( c_col > 0) 
+                	move_print( line, c_row, c_col - 1, last_colour, &sq_size );
 				break;
 
 			case KEY_RIGHT:
-                if ( c_col < col ){
-                	move_print( line, c_row, c_col + 1, last_colour );
-                }
+                if ( c_col < col )
+                	move_print( line, c_row, c_col + 1, last_colour, &sq_size );
 				break;
 
 			case KEY_UP:
-                if ( c_row > 0){
-                	move_print( line, c_row - 1, c_col, last_colour );
-                	}
+                if ( c_row > 0)
+                	move_print( line, c_row - 1, c_col, last_colour, &sq_size );
                 break;
 
 			case KEY_DOWN:
-                if ( c_row < row ){
-                	move_print( line, c_row + 1, c_col, last_colour );
-                	}
+                if ( c_row < row )
+                	move_print( line, c_row + 1, c_col, last_colour, &sq_size );
 				break;
             
             case '1':
@@ -89,15 +86,30 @@ int main( int argc, char *argv[] ) {
                 last_colour = ch - 48;
                 add_colour( last_colour );
                 line = false;
+                sq_size = 1;
                 break;
 
 			case 'c':
 				bkgd( COLOR_PAIR(8) );
-				clear(); 
+				clear();
+                line = false;
+                sq_size = 1;
+                break;
+
             case 'l':
                 line = !line;            
 				break;
-				
+
+            case 'r':
+                sq_size++;
+                for ( sq_r = c_row; sq_r < c_row + sq_size; sq_r++ ) {
+                    for ( sq_c = c_col; sq_c < c_col + sq_size + 1; sq_c++ ) {
+                        add_colour( last_colour );
+                    }
+                    move( sq_r, c_col );
+                }
+                move( c_row, c_col );
+                break; 
 				
             default:
                 break;
